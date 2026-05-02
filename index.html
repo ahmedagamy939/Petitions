@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الاستعلام عن العرائض — نيابة الوادي الجديد الكلية</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1208;
+  --gold: #b8860b;
+  --gold2: #d4a017;
+  --cream: #faf6ee;
+  --border: #d4c9a8;
+  --red: #8b1a1a;
+  --green: #1a4a2e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  direction: rtl;
+}
+
+/* Header */
+.header {
+  background: var(--ink);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(184,134,11,.04) 20px, rgba(184,134,11,.04) 21px);
+}
+.header-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 36px 24px;
+  text-align: center;
+  position: relative;
+}
+.header-logo {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+.header-title {
+  font-family: 'Amiri', serif;
+  color: var(--gold2);
+  font-size: clamp(18px, 4vw, 26px);
+  font-weight: 700;
+  letter-spacing: .5px;
+  margin-bottom: 6px;
+}
+.header-sub {
+  color: rgba(255,255,255,.5);
+  font-size: 13px;
+  font-weight: 300;
+}
+.header-divider {
+  width: 60px;
+  height: 2px;
+  background: var(--gold);
+  margin: 14px auto 0;
+  border-radius: 1px;
+}
+
+/* Main */
+.main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Search Card */
+.search-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 24px rgba(26,18,8,.08);
+  margin-bottom: 24px;
+}
+.search-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #5a4e38;
+  margin-bottom: 10px;
+  display: block;
+}
+.search-input-wrap {
+  display: flex;
+  gap: 10px;
+}
+.search-input {
+  flex: 1;
+  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border .2s;
+  background: var(--cream);
+  direction: ltr;
+  text-align: center;
+  letter-spacing: 2px;
+}
+.search-input:focus { border-color: var(--gold); background: #fff; }
+.search-btn {
+  padding: 13px 24px;
+  background: var(--ink);
+  color: var(--gold2);
+  border: none;
+  border-radius: 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.search-btn:hover { background: #2d2010; transform: translateY(-1px); }
+.search-hint {
+  font-size: 12px;
+  color: #9a8d72;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Results */
+.results { display: none; }
+.results.show { display: block; }
+
+.result-header {
+  font-family: 'Amiri', serif;
+  font-size: 16px;
+  color: #5a4e38;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.result-count {
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.petition-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+}
+.petition-card::before {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--gold);
+  border-radius: 0 12px 12px 0;
+}
+.petition-card:hover { box-shadow: 0 4px 16px rgba(26,18,8,.1); }
+
+.pet-num {
+  font-family: 'Amiri', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.pet-date {
+  font-size: 12px;
+  color: #9a8d72;
+  margin-bottom: 14px;
+}
+.pet-subject {
+  font-size: 13px;
+  color: #4a3e28;
+  margin-bottom: 14px;
+  line-height: 1.6;
+  padding: 8px 12px;
+  background: var(--cream);
+  border-radius: 6px;
+}
+
+.pet-rows { display: grid; gap: 8px; }
+.pet-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 8px;
+  font-size: 12px;
+  align-items: start;
+}
+.pet-row-label {
+  color: #9a8d72;
+  font-weight: 600;
+  padding-top: 2px;
+}
+.pet-row-value {
+  color: var(--ink);
+  line-height: 1.6;
+}
+.pet-row-value.empty { color: #c4b89a; font-style: italic; }
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+.status-done { background: rgba(26,74,46,.1); color: var(--green); }
+.status-pending { background: rgba(184,134,11,.1); color: var(--gold); }
+
+/* No results */
+.no-results {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9a8d72;
+  display: none;
+}
+.no-results.show { display: block; }
+.no-results-icon { font-size: 40px; margin-bottom: 12px; }
+.no-results-text { font-size: 15px; }
+
+/* Error */
+.error-box {
+  background: rgba(139,26,26,.06);
+  border: 1px solid rgba(139,26,26,.2);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: var(--red);
+  margin-top: 14px;
+  display: none;
+  text-align: center;
+}
+.error-box.show { display: block; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 12px;
+  color: #9a8d72;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+
+/* Upload (admin only) */
+.upload-section {
+  margin-top: 32px;
+  padding: 20px;
+  border: 1.5px dashed var(--border);
+  border-radius: 12px;
+  text-align: center;
+  display: none;
+}
+.upload-section.show { display: block; }
+.upload-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: #9a8d72;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.upload-btn:hover { border-color: var(--gold); color: var(--gold); }
+.upload-note { font-size: 11px; color: #b0a08a; margin-top: 6px; }
+
+@media (max-width: 480px) {
+  .search-input-wrap { flex-direction: column; }
+  .search-card { padding: 20px; }
+  .pet-row { grid-template-columns: 80px 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">⚖️</div>
+    <div class="header-title">الاستعلام عن العرائض</div>
+    <div class="header-sub">نيابة الوادي الجديد الكلية</div>
+    <div class="header-divider"></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="search-card">
+    <label class="search-label">أدخل رقمك القومي للاستعلام عن عرائضك</label>
+    <div class="search-input-wrap">
+      <input type="text" class="search-input" id="searchInput" 
+        placeholder="الرقم القومي (14 رقم)" 
+        maxlength="14"
+        onkeydown="if(event.key==='Enter') doSearch()"/>
+      <button class="search-btn" onclick="doSearch()">🔍 بحث</button>
+    </div>
+    <div class="search-hint">أدخل رقمك القومي المكون من 14 رقم</div>
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-header">
+      نتائج البحث — <span class="result-count" id="resultCount"></span>
+    </div>
+    <div id="resultsList"></div>
+  </div>
+
+  <div class="no-results" id="noResults">
+    <div class="no-results-icon">📋</div>
+    <div class="no-results-text">لا توجد عرائض مسجلة بهذا الرقم القومي</div>
+  </div>
+
+  <!-- زرار رفع البيانات (مخفي - للمسؤول فقط) -->
+  <div class="upload-section" id="uploadSection">
+    <div style="font-size:13px;color:#9a8d72;margin-bottom:8px">رفع ملف بيانات العرائض (للمسؤول فقط)</div>
+    <input type="file" id="xlsxFile" accept=".xlsx,.xls" style="display:none" onchange="loadXLSX(this)"/>
+    <button class="upload-btn" onclick="document.getElementById('xlsxFile').click()">📂 اختيار ملف Excel</button>
+    <div class="upload-note" id="uploadNote">لم يتم تحميل ملف بعد</div>
+  </div>
+
+</div>
+
+<div class="footer">
+  نيابة الوادي الجديد الكلية — جميع الحقوق محفوظة
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script>
+// ==================== DATA ====================
+var petitionsData = [];
+
+// كود سري للمسؤول — اضغط على الفوتر 5 مرات
+var footerClicks = 0;
+document.querySelector('.footer').addEventListener('click', function(){
+  footerClicks++;
+  if(footerClicks >= 5){
+    footerClicks = 0;
+    document.getElementById('uploadSection').classList.toggle('show');
+  }
+});
+
+// تحميل البيانات من localStorage لو موجودة
+function loadFromStorage(){
+  try{
+    var saved = localStorage.getItem('petitions_data');
+    if(saved){
+      petitionsData = JSON.parse(saved);
+      document.getElementById('uploadNote').textContent = 'البيانات محملة: ' + petitionsData.length + ' عريضة';
+    }
+  }catch(e){}
+}
+
+// رفع ملف Excel
+function loadXLSX(input){
+  var file = input.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var wb = XLSX.read(e.target.result, {type:'binary'});
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      if(rows.length < 2){ alert('الملف فاضي أو غير صحيح'); return; }
+      // السطر الأول headers
+      var headers = rows[0].map(function(h){ return String(h).trim(); });
+      petitionsData = rows.slice(1).filter(function(r){ return r.some(function(c){ return c; }); }).map(function(row){
+        var obj = {};
+        headers.forEach(function(h, i){ obj[h] = String(row[i]||'').trim(); });
+        return obj;
+      });
+      localStorage.setItem('petitions_data', JSON.stringify(petitionsData));
+      document.getElementById('uploadNote').textContent = 'تم تحميل ' + petitionsData.length + ' عريضة ✓';
+    }catch(e){ alert('خطأ في قراءة الملف: ' + e.message); }
+  };
+  reader.readAsBinaryString(file);
+}
+
+// البحث
+function doSearch(){
+  var val = document.getElementById('searchInput').value.trim();
+  var errBox = document.getElementById('errorBox');
+  errBox.className = 'error-box';
+
+  if(!val){ errBox.textContent = 'يرجى إدخال الرقم القومي'; errBox.className = 'error-box show'; return; }
+  if(val.length !== 14 || !/^[0-9]+$/.test(val)){ errBox.textContent = 'الرقم القومي يجب أن يكون 14 رقم'; errBox.className = 'error-box show'; return; }
+  if(!petitionsData.length){ errBox.textContent = 'لم يتم تحميل بيانات العرائض بعد — تواصل مع الإدارة'; errBox.className = 'error-box show'; return; }
+
+  // البحث بالرقم القومي
+  var numCol = '\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u0642\u0648\u0645\u064a';
+  var found = petitionsData.filter(function(r){
+    return r[numCol] && r[numCol].trim() === val;
+  });
+
+  document.getElementById('results').className = 'results';
+  document.getElementById('noResults').className = 'no-results';
+
+  if(!found.length){
+    document.getElementById('noResults').className = 'no-results show';
+    return;
+  }
+
+  document.getElementById('resultCount').textContent = found.length + ' عريضة';
+  document.getElementById('results').className = 'results show';
+
+  var list = document.getElementById('resultsList');
+  list.innerHTML = '';
+
+  found.forEach(function(r){
+    var petNum = r['\u0631\u0642\u0645 \u0627\u0644\u0639\u0631\u064a\u0636\u0629'] || '';
+    var petDate = r['\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0642\u062f\u064a\u0645'] || '';
+    var subject = r['\u0645\u0648\u0636\u0648\u0639 \u0627\u0644\u0639\u0631\u064a\u0636\u0629'] || '';
+    var kulliTa = r['\u062a\u0623\u0634\u064a\u0631\u0629 \u0627\u0644\u0643\u0644\u064a\u0629'] || '';
+    var lastQarar = r['\u0622\u062e\u0631 \u0642\u0631\u0627\u0631'] || '';
+    var lastTa = r['\u0627\u0644\u062a\u0623\u0634\u064a\u0631\u0629 \u0627\u0644\u0623\u062e\u064a\u0631\u0629'] || '';
+
+    var isDone = lastQarar.indexOf('\u0625\u0631\u0641\u0627\u0642') >= 0 || lastQarar.indexOf('\u062d\u0641\u0638') >= 0;
+
+    var card = document.createElement('div');
+    card.className = 'petition-card';
+    card.innerHTML = 
+      '<div class="pet-num">\u0639\u0631\u064a\u0636\u0629 \u0631\u0642\u0645 ' + petNum + '</div>' +
+      '<div class="pet-date">\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0642\u062f\u064a\u0645: ' + petDate + '</div>' +
+      (subject ? '<div class="pet-subject">' + subject + '</div>' : '') +
+      '<div class="pet-rows">' +
+        (kulliTa ? '<div class="pet-row"><div class="pet-row-label">\u062a\u0623\u0634\u064a\u0631\u0629 \u0627\u0644\u0643\u0644\u064a\u0629</div><div class="pet-row-value">' + kulliTa + '</div></div>' : '') +
+        '<div class="pet-row"><div class="pet-row-label">\u0622\u062e\u0631 \u0642\u0631\u0627\u0631</div><div class="pet-row-value ' + (lastQarar ? '' : 'empty') + '">' + (lastQarar || '\u0642\u064a\u062f \u0627\u0644\u0628\u062d\u062b') + '</div></div>' +
+        (lastTa ? '<div class="pet-row"><div class="pet-row-label">\u0627\u0644\u062a\u0623\u0634\u064a\u0631\u0629</div><div class="pet-row-value">' + lastTa + '</div></div>' : '') +
+      '</div>' +
+      '<span class="status-badge ' + (isDone ? 'status-done' : 'status-pending') + '">' + (isDone ? '\u2713 \u0645\u0646\u062a\u0647\u064a\u0629' : '\u29d7 \u062c\u0627\u0631\u064a \u0627\u0644\u0628\u062d\u062b') + '</span>';
+    list.appendChild(card);
+  });
+}
+
+loadFromStorage();
+</script>
+</body>
+</html>
