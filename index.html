@@ -353,7 +353,12 @@ document.querySelector('.footer').addEventListener('click', function(){
   footerClicks++;
   if(footerClicks >= 5){
     footerClicks = 0;
-    document.getElementById('uploadSection').classList.toggle('show');
+    var pwd = prompt('كلمة المرور:');
+    if(pwd === 'Phobia2512011Troy'){
+      document.getElementById('uploadSection').classList.toggle('show');
+    } else if(pwd !== null){
+      alert('كلمة المرور غير صحيحة');
+    }
   }
 });
 
