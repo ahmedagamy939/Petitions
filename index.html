@@ -14,72 +14,29 @@
   --border: #d4c9a8;
   --red: #8b1a1a;
   --green: #1a4a2e;
+  --blue: #1a3a5f;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Cairo', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; direction: rtl; }
 
-body {
-  font-family: 'Cairo', sans-serif;
-  background: var(--cream);
-  color: var(--ink);
-  min-height: 100vh;
-  direction: rtl;
-}
+/* ===== HEADER ===== */
+.header { background: var(--ink); position: relative; overflow: hidden; }
+.header::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(184,134,11,.04) 20px, rgba(184,134,11,.04) 21px); }
+.header-inner { max-width: 800px; margin: 0 auto; padding: 36px 24px; text-align: center; position: relative; }
+.header-logo { font-size: 36px; margin-bottom: 8px; }
+.header-title { font-family: 'Amiri', serif; color: var(--gold2); font-size: clamp(18px, 4vw, 26px); font-weight: 700; margin-bottom: 6px; }
+.header-sub { color: rgba(255,255,255,.5); font-size: 13px; font-weight: 300; }
+.header-divider { width: 60px; height: 2px; background: var(--gold); margin: 14px auto 0; border-radius: 1px; }
 
-/* Header */
-.header {
-  background: var(--ink);
-  padding: 0;
-  position: relative;
-  overflow: hidden;
-}
-.header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(184,134,11,.04) 20px, rgba(184,134,11,.04) 21px);
-}
-.header-inner {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 36px 24px;
-  text-align: center;
-  position: relative;
-}
-.header-logo {
-  font-size: 36px;
-  margin-bottom: 8px;
-}
-.header-title {
-  font-family: 'Amiri', serif;
-  color: var(--gold2);
-  font-size: clamp(18px, 4vw, 26px);
-  font-weight: 700;
-  letter-spacing: .5px;
-  margin-bottom: 6px;
-}
-.header-sub {
-  color: rgba(255,255,255,.5);
-  font-size: 13px;
-  font-weight: 300;
-}
-.header-divider {
-  width: 60px;
-  height: 2px;
-  background: var(--gold);
-  margin: 14px auto 0;
-  border-radius: 1px;
-}
+/* ===== MAIN ===== */
+.main { max-width: 640px; margin: 0 auto; padding: 40px 20px; }
 
-/* Main */
-.main {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 40px 20px;
-}
+/* ===== VIEWS ===== */
+.view { display: none; }
+.view.active { display: block; }
 
-/* Search Card */
-.search-card {
+/* ===== AUTH CARD ===== */
+.auth-card {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -87,207 +44,169 @@ body {
   box-shadow: 0 4px 24px rgba(26,18,8,.08);
   margin-bottom: 24px;
 }
-.search-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #5a4e38;
-  margin-bottom: 10px;
-  display: block;
+.auth-tabs { display: flex; gap: 0; margin-bottom: 28px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.auth-tab { flex: 1; padding: 11px; text-align: center; font-size: 14px; font-weight: 600; cursor: pointer; background: transparent; border: none; font-family: 'Cairo', sans-serif; color: #9a8d72; transition: all .2s; }
+.auth-tab.active { background: var(--ink); color: var(--gold2); }
+
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 600; color: #5a4e38; margin-bottom: 7px; display: block; }
+.form-input {
+  width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+  font-family: 'Cairo', sans-serif; font-size: 14px; outline: none; transition: border .2s;
+  background: var(--cream); color: var(--ink);
 }
-.search-input-wrap {
-  display: flex;
-  gap: 10px;
+.form-input:focus { border-color: var(--gold); background: #fff; }
+.form-input::placeholder { color: #b0a08a; }
+
+.auth-btn {
+  width: 100%; padding: 13px; background: var(--ink); color: var(--gold2);
+  border: none; border-radius: 10px; font-family: 'Cairo', sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; margin-top: 4px;
 }
+.auth-btn:hover { background: #2d2010; transform: translateY(-1px); }
+.auth-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+.auth-notice {
+  background: rgba(184,134,11,.08); border: 1px solid rgba(184,134,11,.2);
+  border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #7a6030;
+  margin-bottom: 20px; line-height: 1.7; text-align: center;
+}
+
+/* ===== SEARCH CARD ===== */
+.search-card {
+  background: #fff; border: 1px solid var(--border); border-radius: 16px;
+  padding: 28px; box-shadow: 0 4px 24px rgba(26,18,8,.08); margin-bottom: 24px;
+}
+.search-title { font-family: 'Amiri', serif; font-size: 17px; color: var(--ink); margin-bottom: 6px; }
+.search-notice {
+  background: rgba(26,58,95,.06); border: 1px solid rgba(26,58,95,.15);
+  border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #1a3a5f;
+  margin-bottom: 20px; line-height: 1.7;
+}
+.search-notice strong { color: var(--ink); }
+
+.search-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+@media(max-width:480px){ .search-grid { grid-template-columns: 1fr; } }
+
+.search-field { position: relative; }
+.search-field-label { font-size: 12px; font-weight: 600; color: #7a6a4a; margin-bottom: 6px; display: block; }
 .search-input {
-  flex: 1;
-  padding: 13px 16px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  font-family: 'Cairo', sans-serif;
-  font-size: 15px;
-  outline: none;
-  transition: border .2s;
-  background: var(--cream);
-  direction: ltr;
-  text-align: center;
-  letter-spacing: 2px;
+  width: 100%; padding: 11px 12px; border: 1.5px solid var(--border); border-radius: 9px;
+  font-family: 'Cairo', sans-serif; font-size: 14px; outline: none; transition: border .2s;
+  background: var(--cream); color: var(--ink);
 }
 .search-input:focus { border-color: var(--gold); background: #fff; }
+.search-input::placeholder { color: #c4b89a; font-size: 12px; }
+
 .search-btn {
-  padding: 13px 24px;
-  background: var(--ink);
-  color: var(--gold2);
-  border: none;
-  border-radius: 10px;
-  font-family: 'Cairo', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
+  width: 100%; padding: 13px; background: var(--ink); color: var(--gold2);
+  border: none; border-radius: 10px; font-family: 'Cairo', sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s;
 }
 .search-btn:hover { background: #2d2010; transform: translateY(-1px); }
-.search-hint {
-  font-size: 12px;
-  color: #9a8d72;
-  margin-top: 10px;
-  text-align: center;
-}
 
-/* Results */
+/* ===== USER BAR ===== */
+.user-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 16px; background: #fff; border: 1px solid var(--border);
+  border-radius: 10px; margin-bottom: 20px; font-size: 13px;
+}
+.user-bar-name { color: #5a4e38; font-weight: 600; }
+.user-bar-name span { color: var(--gold); }
+.logout-btn {
+  background: transparent; border: 1px solid var(--border); color: #9a8d72;
+  padding: 5px 14px; border-radius: 7px; font-family: 'Cairo', sans-serif;
+  font-size: 12px; cursor: pointer; transition: all .2s;
+}
+.logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* ===== RESULTS ===== */
 .results { display: none; }
 .results.show { display: block; }
-
-.result-header {
-  font-family: 'Amiri', serif;
-  font-size: 16px;
-  color: #5a4e38;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
-}
-.result-count {
-  font-size: 13px;
-  color: var(--gold);
-  font-weight: 600;
-}
+.result-header { font-family: 'Amiri', serif; font-size: 16px; color: #5a4e38; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.result-count { font-size: 13px; color: var(--gold); font-weight: 600; }
 
 .petition-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 12px;
-  transition: box-shadow .2s;
-  position: relative;
-  overflow: hidden;
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; margin-bottom: 12px; transition: box-shadow .2s;
+  position: relative; overflow: hidden;
 }
-.petition-card::before {
-  content: '';
-  position: absolute;
-  right: 0; top: 0; bottom: 0;
-  width: 4px;
-  background: var(--gold);
-  border-radius: 0 12px 12px 0;
-}
+.petition-card::before { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 4px; background: var(--gold); border-radius: 0 12px 12px 0; }
 .petition-card:hover { box-shadow: 0 4px 16px rgba(26,18,8,.1); }
-
-.pet-num {
-  font-family: 'Amiri', serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 4px;
-}
-.pet-date {
-  font-size: 12px;
-  color: #9a8d72;
-  margin-bottom: 14px;
-}
-.pet-subject {
-  font-size: 13px;
-  color: #4a3e28;
-  margin-bottom: 14px;
-  line-height: 1.6;
-  padding: 8px 12px;
-  background: var(--cream);
-  border-radius: 6px;
-}
-
+.pet-num { font-family: 'Amiri', serif; font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.pet-date { font-size: 12px; color: #9a8d72; margin-bottom: 14px; }
+.pet-subject { font-size: 13px; color: #4a3e28; margin-bottom: 14px; line-height: 1.6; padding: 8px 12px; background: var(--cream); border-radius: 6px; }
 .pet-rows { display: grid; gap: 8px; }
-.pet-row {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 8px;
-  font-size: 12px;
-  align-items: start;
-}
-.pet-row-label {
-  color: #9a8d72;
-  font-weight: 600;
-  padding-top: 2px;
-}
-.pet-row-value {
-  color: var(--ink);
-  line-height: 1.6;
-}
+.pet-row { display: grid; grid-template-columns: 110px 1fr; gap: 8px; font-size: 12px; align-items: start; }
+.pet-row-label { color: #9a8d72; font-weight: 600; padding-top: 2px; }
+.pet-row-value { color: var(--ink); line-height: 1.6; }
 .pet-row-value.empty { color: #c4b89a; font-style: italic; }
-
-.status-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-top: 12px;
-}
+.status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 12px; }
 .status-done { background: rgba(26,74,46,.1); color: var(--green); }
 .status-pending { background: rgba(184,134,11,.1); color: var(--gold); }
 
-/* No results */
-.no-results {
-  text-align: center;
-  padding: 40px 20px;
-  color: #9a8d72;
-  display: none;
+/* ===== AMBIGUOUS RESULTS WARNING ===== */
+.ambiguous-warn {
+  background: rgba(139,26,26,.06); border: 1px solid rgba(139,26,26,.2);
+  border-radius: 10px; padding: 14px 18px; font-size: 13px; color: var(--red);
+  margin-bottom: 16px; text-align: center; line-height: 1.7; display: none;
 }
+.ambiguous-warn.show { display: block; }
+
+/* ===== NO RESULTS ===== */
+.no-results { text-align: center; padding: 40px 20px; color: #9a8d72; display: none; }
 .no-results.show { display: block; }
 .no-results-icon { font-size: 40px; margin-bottom: 12px; }
-.no-results-text { font-size: 15px; }
 
-/* Error */
-.error-box {
-  background: rgba(139,26,26,.06);
-  border: 1px solid rgba(139,26,26,.2);
-  border-radius: 10px;
-  padding: 14px 18px;
-  font-size: 13px;
-  color: var(--red);
-  margin-top: 14px;
-  display: none;
-  text-align: center;
-}
+/* ===== ERROR ===== */
+.error-box { background: rgba(139,26,26,.06); border: 1px solid rgba(139,26,26,.2); border-radius: 10px; padding: 14px 18px; font-size: 13px; color: var(--red); margin-top: 14px; display: none; text-align: center; }
 .error-box.show { display: block; }
 
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 24px;
-  font-size: 12px;
-  color: #9a8d72;
-  border-top: 1px solid var(--border);
-  margin-top: 40px;
+/* ===== ADMIN PANEL ===== */
+.admin-bar {
+  background: var(--ink); color: var(--gold2); padding: 10px 16px;
+  border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 600;
+  display: flex; justify-content: space-between; align-items: center;
 }
-
-/* Upload (admin only) */
-.upload-section {
-  margin-top: 32px;
-  padding: 20px;
-  border: 1.5px dashed var(--border);
-  border-radius: 12px;
-  text-align: center;
-  display: none;
-}
-.upload-section.show { display: block; }
+.admin-section { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+.admin-section-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .upload-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: #9a8d72;
-  padding: 8px 18px;
-  border-radius: 8px;
-  font-family: 'Cairo', sans-serif;
-  font-size: 12px;
-  cursor: pointer;
-  margin-top: 8px;
+  background: transparent; border: 1.5px solid var(--border); color: #7a6a4a;
+  padding: 10px 20px; border-radius: 9px; font-family: 'Cairo', sans-serif;
+  font-size: 13px; cursor: pointer; transition: all .2s; display: inline-block;
 }
 .upload-btn:hover { border-color: var(--gold); color: var(--gold); }
-.upload-note { font-size: 11px; color: #b0a08a; margin-top: 6px; }
+.upload-note { font-size: 12px; color: #9a8d72; margin-top: 8px; }
 
-@media (max-width: 480px) {
-  .search-input-wrap { flex-direction: column; }
-  .search-card { padding: 20px; }
-  .pet-row { grid-template-columns: 80px 1fr; }
+.log-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.log-table th { background: var(--cream); padding: 8px 10px; text-align: right; font-weight: 600; color: #5a4e38; border-bottom: 1px solid var(--border); }
+.log-table td { padding: 8px 10px; border-bottom: 1px solid #f0e8d8; color: #4a3e28; }
+.log-table tr:last-child td { border-bottom: none; }
+
+.users-list { display: grid; gap: 8px; }
+.user-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: var(--cream); border-radius: 8px;
+  font-size: 13px;
 }
+.user-item-info { color: #5a4e38; }
+.user-item-date { font-size: 11px; color: #9a8d72; }
+.disable-btn {
+  background: transparent; border: 1px solid rgba(139,26,26,.3); color: var(--red);
+  padding: 4px 12px; border-radius: 6px; font-family: 'Cairo', sans-serif;
+  font-size: 11px; cursor: pointer;
+}
+
+/* ===== UPLOAD SECTION ===== */
+.upload-section { margin-top: 24px; padding: 20px; border: 1.5px dashed var(--border); border-radius: 12px; text-align: center; display: none; }
+.upload-section.show { display: block; }
+
+/* ===== FOOTER ===== */
+.footer { text-align: center; padding: 24px; font-size: 12px; color: #9a8d72; border-top: 1px solid var(--border); margin-top: 40px; cursor: default; }
+
+/* ===== SPINNER ===== */
+.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(212,160,23,.3); border-top-color: var(--gold2); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-left: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -303,158 +222,526 @@ body {
 
 <div class="main">
 
-  <div class="search-card">
-    <label class="search-label">أدخل رقمك القومي للاستعلام عن عرائضك</label>
-    <div class="search-input-wrap">
-      <input type="text" class="search-input" id="searchInput" 
-        placeholder="الرقم القومي (14 رقم)" 
-        maxlength="14"
-        onkeydown="if(event.key==='Enter') doSearch()"/>
+  <!-- ===== VIEW: AUTH ===== -->
+  <div class="view active" id="viewAuth">
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">تسجيل الدخول</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">حساب جديد</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="formLogin">
+        <div class="form-group">
+          <label class="form-label">البريد الإلكتروني</label>
+          <input type="email" class="form-input" id="loginEmail" placeholder="example@email.com" style="direction:ltr;text-align:left"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">كلمة المرور</label>
+          <input type="password" class="form-input" id="loginPassword" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter') doLogin()"/>
+        </div>
+        <div class="error-box" id="loginError"></div>
+        <button class="auth-btn" id="loginBtn" onclick="doLogin()">تسجيل الدخول</button>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="formRegister" style="display:none">
+        <div class="auth-notice">
+          📋 سيتم استخدام بياناتك للتحقق من هويتك عند الاستعلام عن عرائضك
+        </div>
+        <div class="form-group">
+          <label class="form-label">الاسم الكامل</label>
+          <input type="text" class="form-input" id="regName" placeholder="الاسم كما هو مسجل في العريضة"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الرقم القومي</label>
+          <input type="text" class="form-input" id="regNid" placeholder="14 رقم" maxlength="14" style="direction:ltr;text-align:center;letter-spacing:2px"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رقم الموبايل</label>
+          <input type="text" class="form-input" id="regPhone" placeholder="01xxxxxxxxx" maxlength="11" style="direction:ltr;text-align:center"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">البريد الإلكتروني</label>
+          <input type="email" class="form-input" id="regEmail" placeholder="example@email.com" style="direction:ltr;text-align:left"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">كلمة المرور</label>
+          <input type="password" class="form-input" id="regPassword" placeholder="8 أحرف على الأقل" onkeydown="if(event.key==='Enter') doRegister()"/>
+        </div>
+        <div class="error-box" id="registerError"></div>
+        <button class="auth-btn" id="registerBtn" onclick="doRegister()">إنشاء الحساب</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VIEW: SEARCH ===== -->
+  <div class="view" id="viewSearch">
+    <div class="user-bar">
+      <div class="user-bar-name">أهلاً، <span id="userName"></span></div>
+      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+
+    <div class="search-card">
+      <div class="search-title">الاستعلام عن العرائض</div>
+      <div class="search-notice">
+        <strong>يمكنك البحث بأي من الخانات التالية</strong> — لا يلزم ملء جميعها.<br>
+        في حال تشابه الأسماء سيُطلب منك إدخال خانة إضافية للتحقق.
+      </div>
+
+      <div class="search-grid">
+        <div class="search-field">
+          <label class="search-field-label">رقم العريضة</label>
+          <input type="text" class="search-input" id="sPetNum" placeholder="مثال: 199"/>
+        </div>
+        <div class="search-field">
+          <label class="search-field-label">الرقم القومي</label>
+          <input type="text" class="search-input" id="sNid" placeholder="14 رقم" maxlength="14" style="direction:ltr;text-align:center;letter-spacing:1px"/>
+        </div>
+        <div class="search-field">
+          <label class="search-field-label">رقم الموبايل</label>
+          <input type="text" class="search-input" id="sPhone" placeholder="01xxxxxxxxx" maxlength="11" style="direction:ltr;text-align:center"/>
+        </div>
+        <div class="search-field">
+          <label class="search-field-label">الاسم (أو جزء منه)</label>
+          <input type="text" class="search-input" id="sName" placeholder="مثال: محمد علي"/>
+        </div>
+      </div>
+
       <button class="search-btn" onclick="doSearch()">🔍 بحث</button>
+      <div class="error-box" id="searchError"></div>
     </div>
-    <div class="search-hint">أدخل رقمك القومي المكون من 14 رقم</div>
-    <div class="error-box" id="errorBox"></div>
-  </div>
 
-  <div class="results" id="results">
-    <div class="result-header">
-      نتائج البحث — <span class="result-count" id="resultCount"></span>
+    <div class="ambiguous-warn" id="ambiguousWarn">
+      ⚠️ تم العثور على أكثر من نتيجة بنفس الاسم — يرجى إضافة <strong>الرقم القومي</strong> أو <strong>رقم الموبايل</strong> للتحقق من هويتك
     </div>
-    <div id="resultsList"></div>
+
+    <div class="results" id="results">
+      <div class="result-header">نتائج البحث — <span class="result-count" id="resultCount"></span></div>
+      <div id="resultsList"></div>
+    </div>
+
+    <div class="no-results" id="noResults">
+      <div class="no-results-icon">📋</div>
+      <div style="font-size:15px;color:#9a8d72">لا توجد عرائض مسجلة بهذه البيانات</div>
+    </div>
+
+    <!-- رفع ملف (للأدمن فقط) -->
+    <div class="upload-section" id="uploadSection">
+      <div style="font-size:13px;color:#9a8d72;margin-bottom:8px">رفع ملف بيانات العرائض</div>
+      <input type="file" id="xlsxFile" accept=".xlsx,.xls" style="display:none" onchange="loadXLSX(this)"/>
+      <button class="upload-btn" onclick="document.getElementById('xlsxFile').click()">📂 اختيار ملف Excel</button>
+      <div class="upload-note" id="uploadNote">لم يتم تحميل ملف بعد</div>
+    </div>
   </div>
 
-  <div class="no-results" id="noResults">
-    <div class="no-results-icon">📋</div>
-    <div class="no-results-text">لا توجد عرائض مسجلة بهذا الرقم القومي</div>
-  </div>
+  <!-- ===== VIEW: ADMIN ===== -->
+  <div class="view" id="viewAdmin">
+    <div class="admin-bar">
+      <span>🛡️ لوحة الإدارة</span>
+      <button class="logout-btn" style="border-color:rgba(212,160,23,.3);color:var(--gold2)" onclick="doLogout()">خروج</button>
+    </div>
 
-  <!-- زرار رفع البيانات (مخفي - للمسؤول فقط) -->
-  <div class="upload-section" id="uploadSection">
-    <div style="font-size:13px;color:#9a8d72;margin-bottom:8px">رفع ملف بيانات العرائض (للمسؤول فقط)</div>
-    <input type="file" id="xlsxFile" accept=".xlsx,.xls" style="display:none" onchange="loadXLSX(this)"/>
-    <button class="upload-btn" onclick="document.getElementById('xlsxFile').click()">📂 اختيار ملف Excel</button>
-    <div class="upload-note" id="uploadNote">لم يتم تحميل ملف بعد</div>
+    <!-- رفع ملف -->
+    <div class="admin-section">
+      <div class="admin-section-title">📂 بيانات العرائض</div>
+      <input type="file" id="xlsxFileAdmin" accept=".xlsx,.xls" style="display:none" onchange="loadXLSX(this)"/>
+      <button class="upload-btn" onclick="document.getElementById('xlsxFileAdmin').click()">اختيار ملف Excel</button>
+      <div class="upload-note" id="uploadNoteAdmin">لم يتم تحميل ملف بعد</div>
+    </div>
+
+    <!-- سجل البحثات -->
+    <div class="admin-section">
+      <div class="admin-section-title">📋 سجل البحثات الأخيرة</div>
+      <div id="logContainer"><div style="font-size:13px;color:#9a8d72">جاري التحميل...</div></div>
+    </div>
+
+    <!-- المستخدمون -->
+    <div class="admin-section">
+      <div class="admin-section-title">👥 المستخدمون المسجلون</div>
+      <div id="usersContainer"><div style="font-size:13px;color:#9a8d72">جاري التحميل...</div></div>
+    </div>
   </div>
 
 </div>
 
-<div class="footer">
-  نيابة الوادي الجديد الكلية — جميع الحقوق محفوظة
-</div>
+<div class="footer" id="footer">نيابة الوادي الجديد الكلية — جميع الحقوق محفوظة</div>
 
-<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-<script>
-// ==================== DATA ====================
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ===== Firebase Config =====
+const firebaseConfig = {
+  apiKey: "AIzaSyBXg45sve-6qrtGmMnmfdSunDwfcT9dGyk",
+  authDomain: "petition-follow-up-service.firebaseapp.com",
+  projectId: "petition-follow-up-service",
+  storageBucket: "petition-follow-up-service.firebasestorage.app",
+  messagingSenderId: "124756777929",
+  appId: "1:124756777929:web:4ba14233b76c124b002618"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ===== Admin UID (هيتحدد بعد أول تسجيل دخول) =====
+const ADMIN_EMAIL = "ahmedagamy939@gmail.com"; // غيّر ده لإيميلك
+
+// ===== Data =====
 var petitionsData = [];
 
-// كود سري للمسؤول — اضغط على الفوتر 5 مرات
-var footerClicks = 0;
-document.querySelector('.footer').addEventListener('click', function(){
-  footerClicks++;
-  if(footerClicks >= 5){
-    footerClicks = 0;
-    var pwd = prompt('كلمة المرور:');
-    if(pwd === 'Phobia2512011Troy'){
-      document.getElementById('uploadSection').classList.toggle('show');
-    } else if(pwd !== null){
-      alert('كلمة المرور غير صحيحة');
+// تحميل من localStorage
+try {
+  var saved = localStorage.getItem('petitions_data');
+  if (saved) { petitionsData = JSON.parse(saved); updateUploadNotes(); }
+} catch(e) {}
+
+function updateUploadNotes() {
+  var n = petitionsData.length + ' عريضة محملة';
+  var el1 = document.getElementById('uploadNote');
+  var el2 = document.getElementById('uploadNoteAdmin');
+  if (el1) el1.textContent = n;
+  if (el2) el2.textContent = n;
+}
+
+// ===== XLSX =====
+window.loadXLSX = function(input) {
+  var file = input.files[0];
+  if (!file) return;
+  // تحميل SheetJS
+  if (typeof XLSX === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js';
+    s.onload = () => readFile(file);
+    document.head.appendChild(s);
+  } else { readFile(file); }
+
+  function readFile(f) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var wb   = XLSX.read(e.target.result, { type: 'binary' });
+        var ws   = wb.Sheets[wb.SheetNames[0]];
+        var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        if (rows.length < 2) { alert('الملف فاضي'); return; }
+        var headers = rows[0].map(h => String(h).trim());
+        petitionsData = rows.slice(1)
+          .filter(r => r.some(c => c))
+          .map(row => {
+            var obj = {};
+            headers.forEach((h, i) => { obj[h] = String(row[i] || '').trim(); });
+            return obj;
+          });
+        localStorage.setItem('petitions_data', JSON.stringify(petitionsData));
+        updateUploadNotes();
+        alert('تم تحميل ' + petitionsData.length + ' عريضة ✓');
+      } catch(e) { alert('خطأ: ' + e.message); }
+    };
+    reader.readAsBinaryString(f);
+  }
+};
+
+// ===== AUTH STATE =====
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // مسجل دخول
+    var userDoc = await getDoc(doc(db, 'users', user.uid));
+    var userData = userDoc.exists() ? userDoc.data() : {};
+    var isAdmin  = user.email === ADMIN_EMAIL;
+
+    document.getElementById('userName').textContent = userData.name || user.email;
+
+    if (isAdmin) {
+      showView('viewAdmin');
+      loadAdminData();
+    } else {
+      showView('viewSearch');
+      // لو الأدمن كان فاتح upload section يخفيه للمستخدم العادي
     }
+  } else {
+    showView('viewAuth');
   }
 });
 
-// تحميل البيانات من localStorage لو موجودة
-function loadFromStorage(){
-  try{
-    var saved = localStorage.getItem('petitions_data');
-    if(saved){
-      petitionsData = JSON.parse(saved);
-      document.getElementById('uploadNote').textContent = 'البيانات محملة: ' + petitionsData.length + ' عريضة';
-    }
-  }catch(e){}
+// ===== VIEWS =====
+window.showView = function(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+};
+
+// ===== TAB =====
+window.switchTab = function(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('formLogin').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
+};
+
+// ===== LOGIN =====
+window.doLogin = async function() {
+  var email = document.getElementById('loginEmail').value.trim();
+  var pass  = document.getElementById('loginPassword').value;
+  var errEl = document.getElementById('loginError');
+  errEl.className = 'error-box';
+  if (!email || !pass) { errEl.textContent = 'يرجى ملء جميع الحقول'; errEl.className = 'error-box show'; return; }
+  var btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.innerHTML = 'جاري التسجيل <span class="spinner"></span>';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    var msg = 'بيانات غير صحيحة';
+    if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+    errEl.textContent = msg; errEl.className = 'error-box show';
+    btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+  }
+};
+
+// ===== REGISTER =====
+window.doRegister = async function() {
+  var name  = document.getElementById('regName').value.trim();
+  var nid   = document.getElementById('regNid').value.trim();
+  var phone = document.getElementById('regPhone').value.trim();
+  var email = document.getElementById('regEmail').value.trim();
+  var pass  = document.getElementById('regPassword').value;
+  var errEl = document.getElementById('registerError');
+  errEl.className = 'error-box';
+
+  if (!name || !email || !pass) { errEl.textContent = 'يرجى ملء الاسم والبريد وكلمة المرور على الأقل'; errEl.className = 'error-box show'; return; }
+  if (pass.length < 8) { errEl.textContent = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل'; errEl.className = 'error-box show'; return; }
+
+  var btn = document.getElementById('registerBtn');
+  btn.disabled = true; btn.innerHTML = 'جاري الإنشاء <span class="spinner"></span>';
+
+  try {
+    var cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name, nid, phone, email,
+      createdAt: serverTimestamp()
+    });
+  } catch(e) {
+    var msg = 'حدث خطأ';
+    if (e.code === 'auth/email-already-in-use') msg = 'البريد الإلكتروني مستخدم بالفعل';
+    if (e.code === 'auth/invalid-email') msg = 'البريد الإلكتروني غير صحيح';
+    errEl.textContent = msg; errEl.className = 'error-box show';
+    btn.disabled = false; btn.textContent = 'إنشاء الحساب';
+  }
+};
+
+// ===== LOGOUT =====
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+// ===== تطبيع النص (إزالة الهمزات والتاء المربوطة) =====
+function normalizeAr(str) {
+  if (!str) return '';
+  return str
+    .replace(/أ|إ|آ/g, 'ا')
+    .replace(/ة/g, 'ه')
+    .replace(/ى/g, 'ي')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
 
-// رفع ملف Excel
-function loadXLSX(input){
-  var file = input.files[0];
-  if(!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e){
-    try{
-      var wb = XLSX.read(e.target.result, {type:'binary'});
-      var ws = wb.Sheets[wb.SheetNames[0]];
-      var rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
-      if(rows.length < 2){ alert('الملف فاضي أو غير صحيح'); return; }
-      // السطر الأول headers
-      var headers = rows[0].map(function(h){ return String(h).trim(); });
-      petitionsData = rows.slice(1).filter(function(r){ return r.some(function(c){ return c; }); }).map(function(row){
-        var obj = {};
-        headers.forEach(function(h, i){ obj[h] = String(row[i]||'').trim(); });
-        return obj;
-      });
-      localStorage.setItem('petitions_data', JSON.stringify(petitionsData));
-      document.getElementById('uploadNote').textContent = 'تم تحميل ' + petitionsData.length + ' عريضة ✓';
-    }catch(e){ alert('خطأ في قراءة الملف: ' + e.message); }
-  };
-  reader.readAsBinaryString(file);
-}
+// ===== SEARCH =====
+window.doSearch = async function() {
+  var petNum = document.getElementById('sPetNum').value.trim();
+  var nid    = document.getElementById('sNid').value.trim();
+  var phone  = document.getElementById('sPhone').value.trim();
+  var name   = document.getElementById('sName').value.trim();
 
-// البحث
-function doSearch(){
-  var val = document.getElementById('searchInput').value.trim();
-  var errBox = document.getElementById('errorBox');
-  errBox.className = 'error-box';
-
-  if(!val){ errBox.textContent = 'يرجى إدخال الرقم القومي'; errBox.className = 'error-box show'; return; }
-  if(val.length !== 14 || !/^[0-9]+$/.test(val)){ errBox.textContent = 'الرقم القومي يجب أن يكون 14 رقم'; errBox.className = 'error-box show'; return; }
-  if(!petitionsData.length){ errBox.textContent = 'لم يتم تحميل بيانات العرائض بعد — تواصل مع الإدارة'; errBox.className = 'error-box show'; return; }
-
-  // البحث بالرقم القومي
-  var numCol = '\u0627\u0644\u0631\u0642\u0645 \u0627\u0644\u0642\u0648\u0645\u064a';
-  var found = petitionsData.filter(function(r){
-    return r[numCol] && r[numCol].trim() === val;
-  });
-
+  var errEl  = document.getElementById('searchError');
+  errEl.className = 'error-box';
+  document.getElementById('ambiguousWarn').className = 'ambiguous-warn';
   document.getElementById('results').className = 'results';
   document.getElementById('noResults').className = 'no-results';
 
-  if(!found.length){
+  if (!petNum && !nid && !phone && !name) {
+    errEl.textContent = 'يرجى ملء خانة واحدة على الأقل للبحث';
+    errEl.className = 'error-box show';
+    return;
+  }
+  if (!petitionsData.length) {
+    errEl.textContent = 'لم يتم تحميل بيانات العرائض بعد — تواصل مع الإدارة';
+    errEl.className = 'error-box show';
+    return;
+  }
+
+  // تسجيل البحث في Firebase
+  try {
+    var user = auth.currentUser;
+    await addDoc(collection(db, 'searchLogs'), {
+      uid: user ? user.uid : 'unknown',
+      email: user ? user.email : 'unknown',
+      petNum, nid, phone: phone ? phone.substring(0,4)+'*****' : '',
+      name,
+      timestamp: serverTimestamp(),
+      ip: ''
+    });
+  } catch(e) {}
+
+  // البحث
+  var found = petitionsData.filter(function(r) {
+    var colPetNum = 'رقم العريضة';
+    var colNid    = 'الرقم القومي';
+    var colPhone  = 'المحمول';
+    var colName   = 'مقدم العريضة';
+
+    var matchPetNum = petNum ? String(r[colPetNum]||'').trim() === petNum : false;
+    var matchNid    = nid    ? String(r[colNid]||'').trim() === nid       : false;
+    var matchPhone  = phone  ? String(r[colPhone]||'').replace(/[^0-9]/g,'') === phone.replace(/[^0-9]/g,'') : false;
+    var matchName   = name   ? normalizeAr(r[colName]).includes(normalizeAr(name)) : false;
+
+    // لو في أكتر من خانة — كلهم لازم يتطابقوا
+    var filledCount = [petNum, nid, phone, name].filter(Boolean).length;
+    if (filledCount > 1) {
+      var matches = [
+        petNum  ? matchPetNum : null,
+        nid     ? matchNid    : null,
+        phone   ? matchPhone  : null,
+        name    ? matchName   : null,
+      ].filter(x => x !== null);
+      return matches.every(Boolean);
+    }
+
+    // خانة واحدة
+    return matchPetNum || matchNid || matchPhone || matchName;
+  });
+
+  if (!found.length) {
     document.getElementById('noResults').className = 'no-results show';
     return;
   }
 
+  // لو البحث بالاسم بس وفيه أكتر من نتيجة → تحذير
+  if (name && !nid && !phone && !petNum && found.length > 1) {
+    document.getElementById('ambiguousWarn').className = 'ambiguous-warn show';
+    // نعرض النتائج بس بدون رقم قومي وموبايل
+    renderResults(found, true);
+    return;
+  }
+
+  renderResults(found, false);
+};
+
+function renderResults(found, hidePrivate) {
   document.getElementById('resultCount').textContent = found.length + ' عريضة';
   document.getElementById('results').className = 'results show';
 
   var list = document.getElementById('resultsList');
   list.innerHTML = '';
 
-  found.forEach(function(r){
-    var petNum = r['\u0631\u0642\u0645 \u0627\u0644\u0639\u0631\u064a\u0636\u0629'] || '';
-    var petDate = r['\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0642\u062f\u064a\u0645'] || '';
-    var subject = r['\u0645\u0648\u0636\u0648\u0639 \u0627\u0644\u0639\u0631\u064a\u0636\u0629'] || '';
-    var kulliTa = r['\u062a\u0623\u0634\u064a\u0631\u0629 \u0627\u0644\u0643\u0644\u064a\u0629'] || '';
-    var lastQarar = r['\u0622\u062e\u0631 \u0642\u0631\u0627\u0631'] || '';
-    var lastTa = r['\u0627\u0644\u062a\u0623\u0634\u064a\u0631\u0629 \u0627\u0644\u0623\u062e\u064a\u0631\u0629'] || '';
+  found.forEach(function(r) {
+    var petNum   = r['رقم العريضة']    || '';
+    var petDate  = r['تاريخ التقديم'] || '';
+    var subject  = r['موضوع العريضة'] || '';
+    var kulliTa  = r['تأشيرة الكلية'] || '';
+    var lastQ    = r['آخر قرار']       || '';
+    var lastTa   = r['التأشيرة الأخيرة'] || '';
+    var name     = r['مقدم العريضة']  || '';
 
-    var isDone = lastQarar.indexOf('\u0625\u0631\u0641\u0627\u0642') >= 0 || lastQarar.indexOf('\u062d\u0641\u0638') >= 0;
+    var isDone = lastQ.indexOf('إرفاق') >= 0 || lastQ.indexOf('ارفاق') >= 0 || lastQ.indexOf('حفظ') >= 0;
 
     var card = document.createElement('div');
     card.className = 'petition-card';
-    card.innerHTML = 
-      '<div class="pet-num">\u0639\u0631\u064a\u0636\u0629 \u0631\u0642\u0645 ' + petNum + '</div>' +
-      '<div class="pet-date">\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062a\u0642\u062f\u064a\u0645: ' + petDate + '</div>' +
-      (subject ? '<div class="pet-subject">' + subject + '</div>' : '') +
-      '<div class="pet-rows">' +
-        (kulliTa ? '<div class="pet-row"><div class="pet-row-label">\u062a\u0623\u0634\u064a\u0631\u0629 \u0627\u0644\u0643\u0644\u064a\u0629</div><div class="pet-row-value">' + kulliTa + '</div></div>' : '') +
-        '<div class="pet-row"><div class="pet-row-label">\u0622\u062e\u0631 \u0642\u0631\u0627\u0631</div><div class="pet-row-value ' + (lastQarar ? '' : 'empty') + '">' + (lastQarar || '\u0642\u064a\u062f \u0627\u0644\u0628\u062d\u062b') + '</div></div>' +
-        (lastTa ? '<div class="pet-row"><div class="pet-row-label">\u0627\u0644\u062a\u0623\u0634\u064a\u0631\u0629</div><div class="pet-row-value">' + lastTa + '</div></div>' : '') +
-      '</div>' +
-      '<span class="status-badge ' + (isDone ? 'status-done' : 'status-pending') + '">' + (isDone ? '\u2713 \u0645\u0646\u062a\u0647\u064a\u0629' : '\u29d7 \u062c\u0627\u0631\u064a \u0627\u0644\u0628\u062d\u062b') + '</span>';
+
+    var html = '<div class="pet-num">عريضة رقم ' + petNum + '</div>';
+    html += '<div class="pet-date">مقدم العريضة: ' + (hidePrivate ? maskName(name) : name) + ' &nbsp;|&nbsp; تاريخ التقديم: ' + petDate + '</div>';
+    if (subject) html += '<div class="pet-subject">' + subject + '</div>';
+    html += '<div class="pet-rows">';
+    if (kulliTa) html += '<div class="pet-row"><div class="pet-row-label">تأشيرة الكلية</div><div class="pet-row-value">' + kulliTa + '</div></div>';
+    html += '<div class="pet-row"><div class="pet-row-label">آخر قرار</div><div class="pet-row-value ' + (lastQ ? '' : 'empty') + '">' + (lastQ || 'قيد البحث') + '</div></div>';
+    if (lastTa) html += '<div class="pet-row"><div class="pet-row-label">التأشيرة</div><div class="pet-row-value">' + lastTa + '</div></div>';
+    html += '</div>';
+    html += '<span class="status-badge ' + (isDone ? 'status-done' : 'status-pending') + '">' + (isDone ? '✓ منتهية' : '⏷ جاري البحث') + '</span>';
+
+    card.innerHTML = html;
     list.appendChild(card);
   });
 }
 
-loadFromStorage();
+function maskName(name) {
+  var parts = name.split(' ');
+  return parts.map((p, i) => i === 0 ? p : p[0] + '***').join(' ');
+}
+
+// ===== ADMIN DATA =====
+async function loadAdminData() {
+  // سجل البحثات
+  try {
+    var logsQ = query(collection(db, 'searchLogs'), orderBy('timestamp', 'desc'), limit(50));
+    var logsSnap = await getDocs(logsQ);
+    var logs = [];
+    logsSnap.forEach(d => logs.push(d.data()));
+    renderLogs(logs);
+  } catch(e) {
+    document.getElementById('logContainer').innerHTML = '<div style="font-size:12px;color:#9a8d72">لا توجد سجلات بعد</div>';
+  }
+
+  // المستخدمون
+  try {
+    var usersSnap = await getDocs(collection(db, 'users'));
+    var users = [];
+    usersSnap.forEach(d => users.push({ id: d.id, ...d.data() }));
+    renderUsers(users);
+  } catch(e) {
+    document.getElementById('usersContainer').innerHTML = '<div style="font-size:12px;color:#9a8d72">لا يوجد مستخدمون بعد</div>';
+  }
+}
+
+function renderLogs(logs) {
+  if (!logs.length) {
+    document.getElementById('logContainer').innerHTML = '<div style="font-size:12px;color:#9a8d72">لا توجد سجلات بعد</div>';
+    return;
+  }
+  var html = '<table class="log-table"><tr><th>التوقيت</th><th>المستخدم</th><th>بيانات البحث</th></tr>';
+  logs.forEach(function(l) {
+    var ts = l.timestamp ? new Date(l.timestamp.seconds * 1000).toLocaleString('ar-EG') : '-';
+    var searchData = [
+      l.petNum  ? 'عريضة: ' + l.petNum   : '',
+      l.nid     ? 'ق.ق: ' + l.nid        : '',
+      l.phone   ? 'موبايل: ' + l.phone    : '',
+      l.name    ? 'اسم: ' + l.name        : '',
+    ].filter(Boolean).join(' | ');
+    html += '<tr><td>' + ts + '</td><td>' + (l.email||'-') + '</td><td>' + (searchData||'-') + '</td></tr>';
+  });
+  html += '</table>';
+  document.getElementById('logContainer').innerHTML = html;
+}
+
+function renderUsers(users) {
+  if (!users.length) {
+    document.getElementById('usersContainer').innerHTML = '<div style="font-size:12px;color:#9a8d72">لا يوجد مستخدمون بعد</div>';
+    return;
+  }
+  var html = '<div class="users-list">';
+  users.forEach(function(u) {
+    var date = u.createdAt ? new Date(u.createdAt.seconds * 1000).toLocaleDateString('ar-EG') : '-';
+    html += '<div class="user-item">';
+    html += '<div><div class="user-item-info">' + (u.name||'-') + ' — ' + (u.email||'-') + '</div>';
+    html += '<div class="user-item-date">الرقم القومي: ' + (u.nid||'-') + ' | الموبايل: ' + (u.phone||'-') + ' | تاريخ التسجيل: ' + date + '</div></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('usersContainer').innerHTML = html;
+}
+
+// ===== كود سري للأدمن (رفع ملف من صفحة البحث) =====
+var footerClicks = 0;
+document.getElementById('footer').addEventListener('click', function() {
+  footerClicks++;
+  if (footerClicks >= 5) {
+    footerClicks = 0;
+    document.getElementById('uploadSection').classList.toggle('show');
+  }
+});
+
 </script>
 </body>
 </html>
