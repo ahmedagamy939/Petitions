@@ -339,8 +339,12 @@ body { font-family: 'Cairo', sans-serif; background: var(--cream); color: var(--
   <div class="view" id="viewAdmin">
     <div class="admin-bar">
       <span>🛡️ لوحة الإدارة</span>
-      <button class="logout-btn" style="border-color:rgba(212,160,23,.3);color:var(--gold2)" onclick="doLogout()">خروج</button>
+      <div style="display:flex;gap:8px">
+        <button class="logout-btn" style="border-color:rgba(212,160,23,.3);color:var(--gold2)" onclick="showView('viewSearch');document.getElementById('adminSearchMode').value='1'">🔍 استعلام</button>
+        <button class="logout-btn" style="border-color:rgba(212,160,23,.3);color:var(--gold2)" onclick="doLogout()">خروج</button>
+      </div>
     </div>
+    <input type="hidden" id="adminSearchMode" value="0"/>
 
     <!-- رفع ملف -->
     <div class="admin-section">
