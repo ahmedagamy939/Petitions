@@ -465,6 +465,7 @@ onAuthStateChanged(auth, async (user) => {
 
     // حفظ isAdmin في window عشان doSearch يعرفه
     window.currentUserIsAdmin = isAdmin;
+    localStorage.setItem('is_admin', isAdmin ? '1' : '0');
 
     // زرار الرجوع للإدارة — يظهر للأدمن بس
     var backBtn = document.getElementById('backToAdminBtn');
@@ -547,6 +548,7 @@ window.doRegister = async function() {
 
 // ===== LOGOUT =====
 window.doLogout = async function() {
+  localStorage.setItem('is_admin', '0');
   await signOut(auth);
 };
 
@@ -633,7 +635,8 @@ window.doSearch = async function() {
   }
 
   // الأدمن — بحث بدون قيود وبدون تحذير تشابه
-  if (window.currentUserIsAdmin) {
+  var isAdmin = localStorage.getItem('is_admin') === '1';
+  if (isAdmin) {
     renderResults(found, false);
     return;
   }
