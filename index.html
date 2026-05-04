@@ -279,7 +279,10 @@ body { font-family: 'Cairo', sans-serif; background: var(--cream); color: var(--
   <div class="view" id="viewSearch">
     <div class="user-bar">
       <div class="user-bar-name">أهلاً، <span id="userName"></span></div>
-      <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+      <div style="display:flex;gap:8px">
+        <button class="logout-btn" id="backToAdminBtn" style="display:none;border-color:rgba(184,134,11,.4);color:var(--gold)" onclick="showView('viewAdmin');document.getElementById('adminSearchMode').value='0'">🛡️ الإدارة</button>
+        <button class="logout-btn" onclick="doLogout()">تسجيل الخروج</button>
+      </div>
     </div>
 
     <div class="search-card">
@@ -460,12 +463,18 @@ onAuthStateChanged(auth, async (user) => {
 
     document.getElementById('userName').textContent = userData.name || user.email;
 
+    // حفظ isAdmin في window عشان doSearch يعرفه
+    window.currentUserIsAdmin = isAdmin;
+
+    // زرار الرجوع للإدارة — يظهر للأدمن بس
+    var backBtn = document.getElementById('backToAdminBtn');
+    if (backBtn) backBtn.style.display = isAdmin ? 'inline-block' : 'none';
+
     if (isAdmin) {
       showView('viewAdmin');
       loadAdminData();
     } else {
       showView('viewSearch');
-      // لو الأدمن كان فاتح upload section يخفيه للمستخدم العادي
     }
   } else {
     showView('viewAuth');
@@ -623,10 +632,15 @@ window.doSearch = async function() {
     return;
   }
 
+  // الأدمن — بحث بدون قيود وبدون تحذير تشابه
+  if (window.currentUserIsAdmin) {
+    renderResults(found, false);
+    return;
+  }
+
   // لو البحث بالاسم بس وفيه أكتر من نتيجة → تحذير
   if (name && !nid && !phone && !petNum && found.length > 1) {
     document.getElementById('ambiguousWarn').className = 'ambiguous-warn show';
-    // نعرض النتائج بس بدون رقم قومي وموبايل
     renderResults(found, true);
     return;
   }
