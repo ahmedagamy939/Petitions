@@ -351,10 +351,18 @@ body { font-family: 'Cairo', sans-serif; background: var(--cream); color: var(--
 
     <!-- رفع ملف -->
     <div class="admin-section">
-      <div class="admin-section-title">📂 بيانات العرائض</div>
-      <input type="file" id="xlsxFileAdmin" accept=".xlsx,.xls" style="display:none" onchange="loadXLSX(this)"/>
-      <button class="upload-btn" onclick="document.getElementById('xlsxFileAdmin').click()">اختيار ملف Excel</button>
-      <div class="upload-note" id="uploadNoteAdmin">لم يتم تحميل ملف بعد</div>
+      <div class="admin-section-title">📂 ملفات العرائض المرفوعة</div>
+      <div id="sheetsContainer"><div style="font-size:13px;color:#9a8d72">جاري التحميل...</div></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:13px;font-weight:600;color:#5a4e38;margin-bottom:10px">رفع ملف جديد</div>
+        <div class="form-group">
+          <label class="form-label">اسم الملف (مثال: عرائض أبريل 2026)</label>
+          <input type="text" class="form-input" id="sheetName" placeholder="اسم الملف"/>
+        </div>
+        <input type="file" id="xlsxFileAdmin" accept=".xlsx,.xls" style="display:none" onchange="loadXLSX(this)"/>
+        <button class="upload-btn" onclick="startUpload()">📂 اختيار ملف Excel</button>
+        <div class="upload-note" id="uploadNoteAdmin"></div>
+      </div>
     </div>
 
     <!-- سجل البحثات -->
@@ -379,7 +387,7 @@ body { font-family: 'Cairo', sans-serif; background: var(--cream); color: var(--
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp }
+import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp, writeBatch }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ===== Firebase Config =====
@@ -402,55 +410,144 @@ const ADMIN_EMAIL = "ahmedagamy939@gmail.com"; // غيّر ده لإيميلك
 // ===== Data =====
 var petitionsData = [];
 
-// تحميل من localStorage
-try {
-  var saved = localStorage.getItem('petitions_data');
-  if (saved) { petitionsData = JSON.parse(saved); updateUploadNotes(); }
-} catch(e) {}
-
-function updateUploadNotes() {
-  var n = petitionsData.length + ' عريضة محملة';
-  var el1 = document.getElementById('uploadNote');
-  var el2 = document.getElementById('uploadNoteAdmin');
-  if (el1) el1.textContent = n;
-  if (el2) el2.textContent = n;
+async function loadAllSheetsFromFirestore() {
+  try {
+    var sheetsSnap = await getDocs(collection(db, 'sheets'));
+    petitionsData = [];
+    sheetsSnap.forEach(d => {
+      var data = d.data();
+      if (data.rows && Array.isArray(data.rows)) {
+        petitionsData = petitionsData.concat(data.rows);
+      }
+    });
+    console.log('تم تحميل ' + petitionsData.length + ' عريضة');
+  } catch(e) { console.error('خطأ:', e); }
 }
 
-// ===== XLSX =====
+// ===== رفع ملف =====
+window.startUpload = function() {
+  var name = document.getElementById('sheetName').value.trim();
+  if (!name) { alert('يرجى كتابة اسم الملف أولاً'); return; }
+  document.getElementById('xlsxFileAdmin').click();
+};
+
 window.loadXLSX = function(input) {
   var file = input.files[0];
   if (!file) return;
-  // تحميل SheetJS
+  var sheetName = document.getElementById('sheetName').value.trim();
+  if (!sheetName) { alert('يرجى كتابة اسم الملف أولاً'); return; }
+
   if (typeof XLSX === 'undefined') {
     var s = document.createElement('script');
     s.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js';
-    s.onload = () => readFile(file);
+    s.onload = () => readFile(file, sheetName);
     document.head.appendChild(s);
-  } else { readFile(file); }
+  } else { readFile(file, sheetName); }
 
-  function readFile(f) {
+  async function readFile(f, name) {
+    var noteEl = document.getElementById('uploadNoteAdmin');
+    noteEl.textContent = 'جاري القراءة...';
     var reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
       try {
         var wb   = XLSX.read(e.target.result, { type: 'binary' });
         var ws   = wb.Sheets[wb.SheetNames[0]];
         var rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
         if (rows.length < 2) { alert('الملف فاضي'); return; }
         var headers = rows[0].map(h => String(h).trim());
-        petitionsData = rows.slice(1)
+        var data = rows.slice(1)
           .filter(r => r.some(c => c))
           .map(row => {
             var obj = {};
             headers.forEach((h, i) => { obj[h] = String(row[i] || '').trim(); });
             return obj;
           });
-        localStorage.setItem('petitions_data', JSON.stringify(petitionsData));
-        updateUploadNotes();
-        alert('تم تحميل ' + petitionsData.length + ' عريضة ✓');
-      } catch(e) { alert('خطأ: ' + e.message); }
+
+        noteEl.textContent = 'جاري الرفع على Firestore...';
+
+        // حفظ على Firestore بـ chunks (200 عريضة لكل chunk)
+        var chunkSize = 200;
+        var sheetId = name.replace(/\s+/g, '_') + '_' + Date.now();
+
+        for (var i = 0; i < data.length; i += chunkSize) {
+          var chunk = data.slice(i, i + chunkSize);
+          await setDoc(doc(db, 'sheets', sheetId + '_' + i), {
+            name: name,
+            sheetId: sheetId,
+            rows: chunk,
+            uploadedAt: serverTimestamp(),
+            totalRows: data.length,
+            chunkIndex: i
+          });
+          noteEl.textContent = 'جاري الرفع... ' + Math.min(i + chunkSize, data.length) + '/' + data.length;
+        }
+
+        // تسجيل في الـ index
+        await setDoc(doc(db, 'sheetsIndex', sheetId), {
+          name: name,
+          sheetId: sheetId,
+          totalRows: data.length,
+          uploadedAt: serverTimestamp()
+        });
+
+        noteEl.textContent = '✓ تم رفع ' + data.length + ' عريضة';
+        document.getElementById('sheetName').value = '';
+        input.value = '';
+
+        await loadAllSheetsFromFirestore();
+        await renderSheetsList();
+
+      } catch(e) { alert('خطأ: ' + e.message); noteEl.textContent = ''; }
     };
     reader.readAsBinaryString(f);
   }
+};
+
+// عرض قائمة الشيتات
+async function renderSheetsList() {
+  var container = document.getElementById('sheetsContainer');
+  if (!container) return;
+  try {
+    var snap = await getDocs(collection(db, 'sheetsIndex'));
+    if (snap.empty) {
+      container.innerHTML = '<div style="font-size:13px;color:#9a8d72">لم يتم رفع أي ملف بعد</div>';
+      return;
+    }
+    var sheets = [];
+    snap.forEach(d => sheets.push({ id: d.id, ...d.data() }));
+    sheets.sort((a, b) => (b.uploadedAt?.seconds || 0) - (a.uploadedAt?.seconds || 0));
+
+    var html = '<div style="display:grid;gap:8px">';
+    sheets.forEach(s => {
+      var date = s.uploadedAt ? new Date(s.uploadedAt.seconds * 1000).toLocaleDateString('ar-EG') : '-';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--cream);border-radius:8px;font-size:13px">';
+      html += '<div><div style="font-weight:600;color:#1a1208">' + s.name + '</div>';
+      html += '<div style="font-size:11px;color:#9a8d72">' + s.totalRows + ' عريضة — ' + date + '</div></div>';
+      html += '<button onclick="deleteSheet(\'' + s.sheetId + '\')" style="background:transparent;border:1px solid rgba(139,26,26,.3);color:#8b1a1a;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">حذف</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:13px;color:#9a8d72">خطأ في التحميل</div>';
+  }
+}
+
+// حذف شيت
+window.deleteSheet = async function(sheetId) {
+  if (!confirm('هل تريد حذف هذا الملف؟')) return;
+  try {
+    var sheetsSnap = await getDocs(collection(db, 'sheets'));
+    var batch = writeBatch(db);
+    sheetsSnap.forEach(d => {
+      if (d.data().sheetId === sheetId) batch.delete(d.ref);
+    });
+    await batch.commit();
+    await deleteDoc(doc(db, 'sheetsIndex', sheetId));
+    await loadAllSheetsFromFirestore();
+    await renderSheetsList();
+    alert('تم الحذف ✓');
+  } catch(e) { alert('خطأ: ' + e.message); }
 };
 
 // ===== AUTH STATE =====
@@ -474,9 +571,12 @@ onAuthStateChanged(auth, async (user) => {
     if (isAdmin) {
       showView('viewAdmin');
       loadAdminData();
+      renderSheetsList();
     } else {
       showView('viewSearch');
     }
+    // تحميل البيانات من Firestore لكل المستخدمين
+    await loadAllSheetsFromFirestore();
   } else {
     showView('viewAuth');
   }
