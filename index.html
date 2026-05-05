@@ -409,6 +409,7 @@ const ADMIN_EMAIL = "ahmedagamy939@gmail.com"; // غيّر ده لإيميلك
 
 // ===== Data =====
 var petitionsData = [];
+window.petitionsData = petitionsData;
 
 async function loadAllSheetsFromFirestore() {
   try {
@@ -420,6 +421,7 @@ async function loadAllSheetsFromFirestore() {
         petitionsData = petitionsData.concat(data.rows);
       }
     });
+    window.petitionsData = petitionsData;
     console.log('تم تحميل ' + petitionsData.length + ' عريضة');
   } catch(e) { console.error('خطأ:', e); }
 }
@@ -568,15 +570,16 @@ onAuthStateChanged(auth, async (user) => {
     var backBtn = document.getElementById('backToAdminBtn');
     if (backBtn) backBtn.style.display = isAdmin ? 'inline-block' : 'none';
 
+    // تحميل البيانات من Firestore الأول
+    await loadAllSheetsFromFirestore();
+
     if (isAdmin) {
       showView('viewAdmin');
       loadAdminData();
-      renderSheetsList();
+      await renderSheetsList();
     } else {
       showView('viewSearch');
     }
-    // تحميل البيانات من Firestore لكل المستخدمين
-    await loadAllSheetsFromFirestore();
   } else {
     showView('viewAuth');
   }
@@ -682,7 +685,9 @@ window.doSearch = async function() {
     errEl.className = 'error-box show';
     return;
   }
-  if (!petitionsData.length) {
+  // نجيب البيانات من window عشان هي جوه module
+  var localData = window.petitionsData || [];
+  if (!localData.length) {
     errEl.textContent = 'لم يتم تحميل بيانات العرائض بعد — تواصل مع الإدارة';
     errEl.className = 'error-box show';
     return;
@@ -702,7 +707,7 @@ window.doSearch = async function() {
   } catch(e) {}
 
   // البحث
-  var found = petitionsData.filter(function(r) {
+  var found = localData.filter(function(r) {
     var colPetNum = 'رقم العريضة';
     var colNid    = 'الرقم القومي';
     var colPhone  = 'المحمول';
