@@ -556,6 +556,7 @@ async function renderSheetsList() {
       html += '<div style="font-size:11px;color:#9a8d72">' + s.totalRows + ' عريضة — ' + date + '</div></div>';
       html += '<div style="display:flex;gap:6px">';
       html += '<button onclick="renameSheet(\'' + s.sheetId + '\', \'' + s.name.replace(/'/g, "\\'") + '\')" style="background:transparent;border:1px solid rgba(184,134,11,.3);color:#7a6030;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">تعديل</button>';
+      html += '<button onclick="downloadSheet(\'' + s.sheetId + '\', \'' + s.name.replace(/'/g, "\\'") + '\')" style="background:transparent;border:1px solid rgba(26,74,46,.3);color:#1a4a2e;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">تحميل</button>';
       html += '<button onclick="deleteSheet(\'' + s.sheetId + '\')" style="background:transparent;border:1px solid rgba(139,26,26,.3);color:#8b1a1a;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">حذف</button>';
       html += '</div>';
       html += '</div>';
@@ -582,6 +583,43 @@ window.deleteSheet = async function(sheetId) {
     await renderSheetsList();
     alert('تم الحذف ✓');
   } catch(e) { alert('خطأ: ' + e.message); }
+};
+
+window.downloadSheet = async function(sheetId, name) {
+  try {
+    // تحميل XLSX لو مش موجود
+    if (typeof XLSX === 'undefined') {
+      await new Promise((resolve, reject) => {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js';
+        s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    // جيب كل الـ chunks بتاعت الشيت ده
+    var sheetsSnap = await getDocs(collection(db, 'sheets'));
+    var allRows = [];
+    var chunks = [];
+    sheetsSnap.forEach(d => {
+      if (d.data().sheetId === sheetId) chunks.push(d.data());
+    });
+    // ترتيب الـ chunks
+    chunks.sort((a, b) => a.chunkIndex - b.chunkIndex);
+    chunks.forEach(c => { allRows = allRows.concat(c.rows); });
+
+    if (!allRows.length) { alert('مفيش بيانات!'); return; }
+
+    // بناء الـ Excel
+    var headers = Object.keys(allRows[0]);
+    var wsData  = [headers].concat(allRows.map(r => headers.map(h => r[h] || '')));
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!rtl'] = true;
+    XLSX.utils.book_append_sheet(wb, ws, 'عرائض');
+    XLSX.writeFile(wb, name + '.xlsx');
+
+  } catch(e) { alert('خطأ في التحميل: ' + e.message); }
 };
 
 window.renameSheet = async function(sheetId, currentName) {
