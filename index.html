@@ -458,10 +458,24 @@ window.loadXLSX = function(input) {
 };
 
 async function doReadFile(f, name) {
+  if (!f) return;
+  if (!name) { alert('يرجى كتابة اسم الملف أولاً'); return; }
+
   var noteEl = document.getElementById('uploadNoteAdmin');
   noteEl.textContent = 'جاري القراءة...';
 
-  // نقرأ الملف كـ Promise
+  // تحميل XLSX لو مش موجود
+  if (typeof XLSX === 'undefined') {
+    await new Promise((resolve, reject) => {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  // قراءة الملف
   var result = await new Promise((resolve, reject) => {
     var reader = new FileReader();
     reader.onload = e => resolve(e.target.result);
@@ -492,33 +506,29 @@ async function doReadFile(f, name) {
     for (var i = 0; i < data.length; i += chunkSize) {
       var chunk = data.slice(i, i + chunkSize);
       await setDoc(doc(db, 'sheets', sheetId + '_' + i), {
-        name: name,
-        sheetId: sheetId,
-        rows: chunk,
-        uploadedAt: serverTimestamp(),
-        totalRows: data.length,
-        chunkIndex: i
+        name: name, sheetId: sheetId, rows: chunk,
+        uploadedAt: serverTimestamp(), totalRows: data.length, chunkIndex: i
       });
       noteEl.textContent = 'جاري الرفع... ' + Math.min(i + chunkSize, data.length) + '/' + data.length;
-      console.log('رفع chunk ' + i);
     }
 
     await setDoc(doc(db, 'sheetsIndex', sheetId), {
-      name: name,
-      sheetId: sheetId,
-      totalRows: data.length,
-      uploadedAt: serverTimestamp()
+      name: name, sheetId: sheetId,
+      totalRows: data.length, uploadedAt: serverTimestamp()
     });
 
     noteEl.textContent = '✓ تم رفع ' + data.length + ' عريضة';
     document.getElementById('sheetName').value = '';
-    console.log('✅ تم الرفع بنجاح');
+    // reset file input
+    var fi = document.getElementById('xlsxFileAdmin');
+    if (fi) fi.value = '';
 
+    console.log('✅ تم الرفع بنجاح');
     await loadAllSheetsFromFirestore();
     await renderSheetsList();
 
   } catch(e) {
-    console.error('❌ خطأ في الرفع:', e);
+    console.error('❌ خطأ:', e);
     alert('خطأ: ' + e.message);
     noteEl.textContent = '';
   }
@@ -544,7 +554,10 @@ async function renderSheetsList() {
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--cream);border-radius:8px;font-size:13px">';
       html += '<div><div style="font-weight:600;color:#1a1208">' + s.name + '</div>';
       html += '<div style="font-size:11px;color:#9a8d72">' + s.totalRows + ' عريضة — ' + date + '</div></div>';
+      html += '<div style="display:flex;gap:6px">';
+      html += '<button onclick="renameSheet(\'' + s.sheetId + '\', \'' + s.name.replace(/'/g, "\\'") + '\')" style="background:transparent;border:1px solid rgba(184,134,11,.3);color:#7a6030;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">تعديل</button>';
       html += '<button onclick="deleteSheet(\'' + s.sheetId + '\')" style="background:transparent;border:1px solid rgba(139,26,26,.3);color:#8b1a1a;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">حذف</button>';
+      html += '</div>';
       html += '</div>';
     });
     html += '</div>';
@@ -568,6 +581,25 @@ window.deleteSheet = async function(sheetId) {
     await loadAllSheetsFromFirestore();
     await renderSheetsList();
     alert('تم الحذف ✓');
+  } catch(e) { alert('خطأ: ' + e.message); }
+};
+
+window.renameSheet = async function(sheetId, currentName) {
+  var newName = prompt('اسم جديد للملف:', currentName);
+  if (!newName || newName.trim() === currentName) return;
+  newName = newName.trim();
+  try {
+    // تحديث الـ index
+    await setDoc(doc(db, 'sheetsIndex', sheetId), { name: newName }, { merge: true });
+    // تحديث كل الـ chunks
+    var sheetsSnap = await getDocs(collection(db, 'sheets'));
+    var batch = writeBatch(db);
+    sheetsSnap.forEach(d => {
+      if (d.data().sheetId === sheetId) batch.update(d.ref, { name: newName });
+    });
+    await batch.commit();
+    await renderSheetsList();
+    alert('تم التعديل ✓');
   } catch(e) { alert('خطأ: ' + e.message); }
 };
 
