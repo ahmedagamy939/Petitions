@@ -359,7 +359,7 @@ body { font-family: 'Cairo', sans-serif; background: var(--cream); color: var(--
           <label class="form-label">اسم الملف (مثال: عرائض أبريل 2026)</label>
           <input type="text" class="form-input" id="sheetName" placeholder="اسم الملف"/>
         </div>
-        <input type="file" id="xlsxFileAdmin" accept=".xlsx,.xls" style="display:none" onchange="loadXLSX(this)"/>
+      <input type="file" id="xlsxFileAdmin" accept=".xlsx,.xls" style="display:none"/>
         <button class="upload-btn" onclick="startUpload()">📂 اختيار ملف Excel</button>
         <div class="upload-note" id="uploadNoteAdmin"></div>
       </div>
@@ -403,6 +403,16 @@ const firebaseConfig = {
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
+
+// ===== ربط file inputs بالـ module =====
+document.addEventListener('DOMContentLoaded', () => {
+  var adminInput = document.getElementById('xlsxFileAdmin');
+  if (adminInput) {
+    adminInput.addEventListener('change', function() {
+      doReadFile(this.files[0], document.getElementById('sheetName').value.trim());
+    });
+  }
+});
 
 // ===== Admin UID (هيتحدد بعد أول تسجيل دخول) =====
 const ADMIN_EMAIL = "ahmedagamy939@gmail.com"; // غيّر ده لإيميلك
