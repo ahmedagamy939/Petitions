@@ -360,6 +360,7 @@ body { font-family: 'Cairo', sans-serif; background: var(--cream); color: var(--
           <input type="text" class="form-input" id="sheetName" placeholder="اسم الملف"/>
         </div>
       <input type="file" id="xlsxFileAdmin" accept=".xlsx,.xls" style="display:none"/>
+        <input type="file" id="xlsxFileReplace" accept=".xlsx,.xls" style="display:none"/>
         <button class="upload-btn" onclick="startUpload()">📂 اختيار ملف Excel</button>
         <div class="upload-note" id="uploadNoteAdmin"></div>
       </div>
@@ -410,6 +411,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (adminInput) {
     adminInput.addEventListener('change', function() {
       doReadFile(this.files[0], document.getElementById('sheetName').value.trim());
+    });
+  }
+  var replaceInput = document.getElementById('xlsxFileReplace');
+  if (replaceInput) {
+    replaceInput.addEventListener('change', async function() {
+      var sheetId = this.dataset.sheetId;
+      var name    = this.dataset.name;
+      if (!sheetId || !name) return;
+      await doReplaceFile(this.files[0], sheetId, name);
+      this.value = '';
     });
   }
 });
@@ -557,6 +568,7 @@ async function renderSheetsList() {
       html += '<div style="display:flex;gap:6px">';
       html += '<button onclick="renameSheet(\'' + s.sheetId + '\', \'' + s.name.replace(/'/g, "\\'") + '\')" style="background:transparent;border:1px solid rgba(184,134,11,.3);color:#7a6030;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">تعديل</button>';
       html += '<button onclick="downloadSheet(\'' + s.sheetId + '\', \'' + s.name.replace(/'/g, "\\'") + '\')" style="background:transparent;border:1px solid rgba(26,74,46,.3);color:#1a4a2e;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">تحميل</button>';
+      html += '<button onclick="replaceSheet(\'' + s.sheetId + '\', \'' + s.name.replace(/'/g, "\\'") + '\')" style="background:transparent;border:1px solid rgba(26,58,95,.3);color:#1a3a5f;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">استبدال</button>';
       html += '<button onclick="deleteSheet(\'' + s.sheetId + '\')" style="background:transparent;border:1px solid rgba(139,26,26,.3);color:#8b1a1a;padding:4px 12px;border-radius:6px;font-family:Cairo,sans-serif;font-size:11px;cursor:pointer">حذف</button>';
       html += '</div>';
       html += '</div>';
@@ -584,6 +596,89 @@ window.deleteSheet = async function(sheetId) {
     alert('تم الحذف ✓');
   } catch(e) { alert('خطأ: ' + e.message); }
 };
+
+// ===== استبدال ملف =====
+window.replaceSheet = function(sheetId, name) {
+  var input = document.getElementById('xlsxFileReplace');
+  input.dataset.sheetId = sheetId;
+  input.dataset.name    = name;
+  input.click();
+};
+
+async function doReplaceFile(f, sheetId, name) {
+  if (!f) return;
+  if (!confirm('هل تريد استبدال بيانات "' + name + '"؟ سيتم حذف البيانات القديمة.')) return;
+
+  var noteEl = document.getElementById('uploadNoteAdmin');
+  noteEl.textContent = 'جاري الاستبدال...';
+
+  try {
+    // تحميل XLSX لو مش موجود
+    if (typeof XLSX === 'undefined') {
+      await new Promise((resolve, reject) => {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js';
+        s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    // قراءة الملف الجديد
+    var result = await new Promise((resolve, reject) => {
+      var reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = reject;
+      reader.readAsBinaryString(f);
+    });
+
+    var wb      = XLSX.read(result, { type: 'binary' });
+    var ws      = wb.Sheets[wb.SheetNames[0]];
+    var rows    = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    if (rows.length < 2) { alert('الملف فاضي'); return; }
+    var headers = rows[0].map(h => String(h).trim());
+    var data    = rows.slice(1)
+      .filter(r => r.some(c => c))
+      .map(row => {
+        var obj = {};
+        headers.forEach((h, i) => { obj[h] = String(row[i] || '').trim(); });
+        return obj;
+      });
+
+    noteEl.textContent = 'جاري حذف البيانات القديمة...';
+
+    // حذف الـ chunks القديمة
+    var oldSnap = await getDocs(collection(db, 'sheets'));
+    var batch   = writeBatch(db);
+    oldSnap.forEach(d => { if (d.data().sheetId === sheetId) batch.delete(d.ref); });
+    await batch.commit();
+
+    // رفع البيانات الجديدة بنفس الـ sheetId
+    var chunkSize = 200;
+    for (var i = 0; i < data.length; i += chunkSize) {
+      var chunk = data.slice(i, i + chunkSize);
+      await setDoc(doc(db, 'sheets', sheetId + '_' + i), {
+        name: name, sheetId: sheetId, rows: chunk,
+        uploadedAt: serverTimestamp(), totalRows: data.length, chunkIndex: i
+      });
+      noteEl.textContent = 'جاري الرفع... ' + Math.min(i + chunkSize, data.length) + '/' + data.length;
+    }
+
+    // تحديث الـ index
+    await setDoc(doc(db, 'sheetsIndex', sheetId), {
+      name: name, sheetId: sheetId,
+      totalRows: data.length, uploadedAt: serverTimestamp()
+    });
+
+    noteEl.textContent = '✓ تم الاستبدال — ' + data.length + ' عريضة';
+    await loadAllSheetsFromFirestore();
+    await renderSheetsList();
+
+  } catch(e) {
+    console.error('❌ خطأ في الاستبدال:', e);
+    alert('خطأ: ' + e.message);
+    noteEl.textContent = '';
+  }
+}
 
 window.downloadSheet = async function(sheetId, name) {
   try {
