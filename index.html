@@ -501,7 +501,7 @@ async function doReadFile(f, name) {
     noteEl.textContent = 'جاري الرفع على Firestore...';
 
     var chunkSize = 200;
-    var sheetId = name.replace(/\s+/g, '_') + '_' + Date.now();
+    var sheetId = name.replace(/\s+/g, '_') + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
 
     for (var i = 0; i < data.length; i += chunkSize) {
       var chunk = data.slice(i, i + chunkSize);
